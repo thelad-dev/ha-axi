@@ -23,6 +23,22 @@ describe("requireMutationConfirm", () => {
     ).rejects.toMatchObject({ code: "CONFIRM_REQUIRED" } satisfies Partial<AxiError>);
   });
 
+  it("includes summary and danger notes in CONFIRM_REQUIRED", async () => {
+    await expect(
+      requireMutationConfirm({
+        summary: "Call Home Assistant service shell_command.backup",
+        dangerNotes: ["dangerous service shell_command.backup"],
+        confirmFlag: false,
+        isTty: false,
+      }),
+    ).rejects.toMatchObject({
+      code: "CONFIRM_REQUIRED",
+      message: expect.stringMatching(
+        /Call Home Assistant service shell_command\.backup[\s\S]*dangerous service shell_command\.backup/,
+      ),
+    });
+  });
+
   it("honors interactive yes/no", async () => {
     await expect(
       requireMutationConfirm({

@@ -115,7 +115,7 @@ async function serviceCall(
     );
   }
 
-const flagEntityId =
+  const flagEntityId =
     flagString(flags, "entity-id") ?? flagString(flags, "entity_id");
   let data: Record<string, unknown> = {};
   const dataRaw = flagString(flags, "data");
@@ -171,14 +171,32 @@ const flagEntityId =
   return format === "json" ? renderPayload(payload, "json") : payload;
 }
 
-/** Resolve target entity ids from merged service data (string or list). */
+/** Resolve entity ids from merged service data / target (string or list). */
 function entityIdsFromServiceData(data: Record<string, unknown>): string[] {
-  const raw = data.entity_id;
-  if (typeof raw === "string" && raw.length > 0) return [raw];
-  if (Array.isArray(raw)) {
-    return raw.filter(
-      (id): id is string => typeof id === "string" && id.length > 0,
-    );
+  const ids: string[] = [];
+  const seen = new Set<string>();
+  const collect = (raw: unknown): void => {
+    if (typeof raw === "string" && raw.length > 0) {
+      if (!seen.has(raw)) {
+        seen.add(raw);
+        ids.push(raw);
+      }
+      return;
+    }
+    if (Array.isArray(raw)) {
+      for (const id of raw) {
+        if (typeof id === "string" && id.length > 0 && !seen.has(id)) {
+          seen.add(id);
+          ids.push(id);
+        }
+      }
+    }
+  };
+
+  collect(data.entity_id);
+  const target = data.target;
+  if (target && typeof target === "object" && !Array.isArray(target)) {
+    collect((target as Record<string, unknown>).entity_id);
   }
-  return [];
+  return ids;
 }
