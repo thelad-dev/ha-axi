@@ -1,8 +1,4 @@
-import {
-  flagString,
-  parseFlags,
-  parseLimit,
-} from "../args.js";
+import { flagString, parseFlags, parseLimit } from "../args.js";
 import type { HaAxiContext } from "../context.js";
 import type { HaState } from "../ha-client.js";
 import {
@@ -39,7 +35,7 @@ async function entitySearch(
     "entity search",
   );
   const format = resolveFormat(flags);
-  const query = (positionals[0] ?? flagString(flags, "query") ?? "").trim();
+  const query = (positionals[0] ?? "").trim();
   if (!query) {
     throw new AxiError("entity search requires <query>", "VALIDATION_ERROR", [
       'Run `ha-axi entity search kitchen`',
