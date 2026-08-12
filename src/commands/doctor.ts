@@ -1,4 +1,5 @@
 import {
+  expectPositionals,
   flagBool,
   flagString,
   parseFlags,
@@ -17,8 +18,11 @@ export async function doctorCommand(
   ctx: HaAxiContext | undefined,
 ): Promise<string | Record<string, unknown>> {
   if (!ctx) throw new Error("missing context");
-  const { flags } = parseFlags(args, ["json", "confirm", "full", "help"]);
+  const { positionals, flags } = parseFlags(args, ["json", "confirm", "full", "help"]);
   rejectUnknownFlags(flags, ["format", "json"], "doctor");
+  expectPositionals(positionals, 0, {
+    usage: "Run `ha-axi doctor`",
+  });
   const format = resolveFormat(flags);
 
   const { client, config } = ctx;

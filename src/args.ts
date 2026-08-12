@@ -84,3 +84,42 @@ export function flagBool(
 ): boolean {
   return flags[name] === true || flags[name] === "true";
 }
+
+/**
+ * Reject unexpected (or missing) positional args before network/confirm.
+ * Returns the positionals when the arity matches exactly.
+ */
+export function expectPositionals(
+  positionals: string[],
+  count: number,
+  options: {
+    usage: string;
+    missingMessage?: string;
+    extraHelp?: (extras: string[]) => string[];
+  },
+): string[] {
+  if (positionals.length === count) return positionals;
+  if (positionals.length < count) {
+    throw new AxiError(
+      options.missingMessage ??
+        `expected ${count} positional argument${count === 1 ? "" : "s"}, got ${positionals.length}`,
+      "VALIDATION_ERROR",
+      [options.usage],
+    );
+  }
+  const extras = positionals.slice(count);
+  const help = [
+    options.usage,
+    ...(options.extraHelp?.(extras) ?? []),
+  ].filter(Boolean);
+  throw new AxiError(
+    `unexpected positional argument${extras.length === 1 ? "" : "s"}: ${extras.join(", ")}`,
+    "VALIDATION_ERROR",
+    help,
+  );
+}
+
+/** Heuristic: HA entity ids look like domain.object_id */
+export function looksLikeEntityId(value: string): boolean {
+  return /^[a-z][a-z0-9_]*\.[a-z0-9_]+$/i.test(value);
+}

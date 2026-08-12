@@ -1,4 +1,4 @@
-import { flagString, parseFlags, parseLimit } from "../args.js";
+import { expectPositionals, flagString, parseFlags, parseLimit } from "../args.js";
 import type { HaAxiContext } from "../context.js";
 import {
   AxiError,
@@ -25,12 +25,15 @@ async function areaList(
   args: string[],
   ctx: HaAxiContext,
 ): Promise<string | Record<string, unknown>> {
-  const { flags } = parseFlags(args, ["json", "help"]);
+  const { positionals, flags } = parseFlags(args, ["json", "help"]);
   rejectUnknownFlags(
     flags,
     ["limit", "search", "format", "json"],
     "area list",
   );
+  expectPositionals(positionals, 0, {
+    usage: "Run `ha-axi area list [--search <q>]`",
+  });
   const format = resolveFormat(flags);
   const limit = parseLimit(flags.limit, 100, 500);
   const search = (flagString(flags, "search") ?? "").toLowerCase();
