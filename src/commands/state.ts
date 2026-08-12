@@ -1,4 +1,5 @@
 import {
+  expectPositionals,
   flagBool,
   flagString,
   parseFlags,
@@ -38,12 +39,15 @@ async function stateList(
   args: string[],
   ctx: HaAxiContext,
 ): Promise<string | Record<string, unknown>> {
-  const { flags } = parseFlags(args, ["json", "full", "help"]);
+  const { positionals, flags } = parseFlags(args, ["json", "full", "help"]);
   rejectUnknownFlags(
     flags,
     ["domain", "search", "limit", "fields", "format", "json", "full"],
     "state list",
   );
+  expectPositionals(positionals, 0, {
+    usage: "Run `ha-axi state list [--domain <domain>] [--search <q>]`",
+  });
   const format = resolveFormat(flags);
   const domain = flagString(flags, "domain");
   const search = (flagString(flags, "search") ?? "").toLowerCase();
@@ -85,12 +89,10 @@ async function stateGet(
   const { positionals, flags } = parseFlags(args, ["json", "full", "help"]);
   rejectUnknownFlags(flags, ["format", "json", "full"], "state get");
   const format = resolveFormat(flags);
-  const entityId = positionals[0];
-  if (!entityId) {
-    throw new AxiError("state get requires <entity_id>", "VALIDATION_ERROR", [
-      "Run `ha-axi state get light.kitchen`",
-    ]);
-  }
+  const [entityId] = expectPositionals(positionals, 1, {
+    usage: "Run `ha-axi state get light.kitchen`",
+    missingMessage: "state get requires <entity_id>",
+  });
   const full = flagBool(flags, "full");
   const state = await ctx.client.getState(entityId);
   const attrs = formatAttributes(state.attributes ?? {}, full);

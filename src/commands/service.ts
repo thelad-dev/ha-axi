@@ -1,6 +1,8 @@
 import {
+  expectPositionals,
   flagBool,
   flagString,
+  looksLikeEntityId,
   parseFlags,
   parseLimit,
 } from "../args.js";
@@ -43,8 +45,11 @@ async function serviceList(
   args: string[],
   ctx: HaAxiContext,
 ): Promise<string | Record<string, unknown>> {
-  const { flags } = parseFlags(args, ["json", "help"]);
+  const { positionals, flags } = parseFlags(args, ["json", "help"]);
   rejectUnknownFlags(flags, ["domain", "limit", "format", "json"], "service list");
+  expectPositionals(positionals, 0, {
+    usage: "Run `ha-axi service list [--domain <domain>]`",
+  });
   const format = resolveFormat(flags);
   const domainFilter = flagString(flags, "domain");
   const limit = parseLimit(flags.limit, 40, 500);
@@ -103,17 +108,17 @@ async function serviceCall(
     "service call",
   );
   const format = resolveFormat(flags);
-  const domain = positionals[0];
-  const service = positionals[1];
-  if (!domain || !service) {
-    throw new AxiError(
-      "service call requires <domain> <service>",
-      "VALIDATION_ERROR",
-      [
-        "Run `ha-axi service call light turn_on --entity-id light.kitchen --confirm`",
-      ],
-    );
-  }
+  const [domain, service] = expectPositionals(positionals, 2, {
+    usage:
+      "Run `ha-axi service call light turn_on --entity-id light.kitchen --confirm`",
+    missingMessage: "service call requires <domain> <service>",
+    extraHelp: (extras) =>
+      extras.some(looksLikeEntityId)
+        ? [
+            "Pass targets with --entity-id <id> (or --data), not as extra positionals",
+          ]
+        : [],
+  });
 
   const flagEntityId =
     flagString(flags, "entity-id") ?? flagString(flags, "entity_id");

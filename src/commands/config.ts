@@ -1,4 +1,4 @@
-import { flagBool, parseFlags } from "../args.js";
+import { expectPositionals, flagBool, parseFlags } from "../args.js";
 import { requireMutationConfirm } from "../confirm.js";
 import type { HaAxiContext } from "../context.js";
 import {
@@ -28,8 +28,11 @@ async function configInfo(
   args: string[],
   ctx: HaAxiContext,
 ): Promise<string | Record<string, unknown>> {
-  const { flags } = parseFlags(args, ["json", "help"]);
+  const { positionals, flags } = parseFlags(args, ["json", "help"]);
   rejectUnknownFlags(flags, ["format", "json"], "config info");
+  expectPositionals(positionals, 0, {
+    usage: "Run `ha-axi config info`",
+  });
   const format = resolveFormat(flags);
   const cfg = await ctx.client.getConfig();
   const payload: Record<string, unknown> = {
@@ -53,8 +56,11 @@ async function configCheck(
   args: string[],
   ctx: HaAxiContext,
 ): Promise<string | Record<string, unknown>> {
-  const { flags } = parseFlags(args, ["json", "confirm", "help"]);
+  const { positionals, flags } = parseFlags(args, ["json", "confirm", "help"]);
   rejectUnknownFlags(flags, ["confirm", "format", "json"], "config check");
+  expectPositionals(positionals, 0, {
+    usage: "Run `ha-axi config check --confirm`",
+  });
   const format = resolveFormat(flags);
 
   await requireMutationConfirm({

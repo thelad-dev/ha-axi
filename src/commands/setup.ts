@@ -1,5 +1,5 @@
 import { installSessionStartHooks } from "axi-sdk-js";
-import { parseFlags } from "../args.js";
+import { expectPositionals, parseFlags } from "../args.js";
 import type { HaAxiContext } from "../context.js";
 import {
   AxiError,
@@ -18,8 +18,11 @@ export async function setupCommand(
       "Run `ha-axi setup hooks`",
     ]);
   }
-  const { flags } = parseFlags(args.slice(1), ["json", "help"]);
+  const { positionals, flags } = parseFlags(args.slice(1), ["json", "help"]);
   rejectUnknownFlags(flags, ["format", "json"], "setup hooks");
+  expectPositionals(positionals, 0, {
+    usage: "Run `ha-axi setup hooks`",
+  });
   const format = resolveFormat(flags);
 
   installSessionStartHooks({

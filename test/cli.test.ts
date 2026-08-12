@@ -443,6 +443,37 @@ describe("value flag validation", () => {
   });
 });
 
+describe("positional arity validation", () => {
+  it("rejects entity target as third service call positional", async () => {
+    const { ctx, serviceCalls } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      ["service", "call", "switch", "turn_off", "switch.desk", "--confirm"],
+      ctx,
+    );
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|unexpected positional/i);
+    expect(stdout).toMatch(/--entity-id/i);
+    expect(serviceCalls).toEqual([]);
+  });
+
+  it("rejects extra positionals on state list", async () => {
+    const { ctx } = createTestContext();
+    const { stdout, exitCode } = await runCli(["state", "list", "light"], ctx);
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|unexpected positional/i);
+  });
+
+  it("rejects extra positionals on state get", async () => {
+    const { ctx } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      ["state", "get", "light.kitchen", "light.other"],
+      ctx,
+    );
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|unexpected positional/i);
+  });
+});
+
 describe("automation / config / registry", () => {
   it("lists automations", async () => {
     const { ctx } = createTestContext();

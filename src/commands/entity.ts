@@ -1,4 +1,4 @@
-import { flagString, parseFlags, parseLimit } from "../args.js";
+import { expectPositionals, flagString, parseFlags, parseLimit } from "../args.js";
 import type { HaAxiContext } from "../context.js";
 import type { HaState } from "../ha-client.js";
 import {
@@ -35,10 +35,14 @@ async function entitySearch(
     "entity search",
   );
   const format = resolveFormat(flags);
-  const query = (positionals[0] ?? "").trim();
+  const [rawQuery] = expectPositionals(positionals, 1, {
+    usage: "Run `ha-axi entity search kitchen`",
+    missingMessage: "entity search requires <query>",
+  });
+  const query = rawQuery.trim();
   if (!query) {
     throw new AxiError("entity search requires <query>", "VALIDATION_ERROR", [
-      'Run `ha-axi entity search kitchen`',
+      "Run `ha-axi entity search kitchen`",
     ]);
   }
   const domain = flagString(flags, "domain");

@@ -1,4 +1,5 @@
 import {
+  expectPositionals,
   flagBool,
   flagString,
   parseFlags,
@@ -42,12 +43,15 @@ async function automationList(
   args: string[],
   ctx: HaAxiContext,
 ): Promise<string | Record<string, unknown>> {
-  const { flags } = parseFlags(args, ["json", "help"]);
+  const { positionals, flags } = parseFlags(args, ["json", "help"]);
   rejectUnknownFlags(
     flags,
     ["limit", "search", "format", "json"],
     "automation list",
   );
+  expectPositionals(positionals, 0, {
+    usage: "Run `ha-axi automation list [--search <q>]`",
+  });
   const format = resolveFormat(flags);
   const limit = parseLimit(flags.limit, 50, 500);
   const search = (flagString(flags, "search") ?? "").toLowerCase();
@@ -86,8 +90,11 @@ async function automationReload(
   args: string[],
   ctx: HaAxiContext,
 ): Promise<string | Record<string, unknown>> {
-  const { flags } = parseFlags(args, ["json", "confirm", "help"]);
+  const { positionals, flags } = parseFlags(args, ["json", "confirm", "help"]);
   rejectUnknownFlags(flags, ["confirm", "format", "json"], "automation reload");
+  expectPositionals(positionals, 0, {
+    usage: "Run `ha-axi automation reload --confirm`",
+  });
   const format = resolveFormat(flags);
 
   await requireMutationConfirm({

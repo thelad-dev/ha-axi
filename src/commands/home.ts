@@ -1,7 +1,7 @@
 import { collapseHome } from "../config.js";
 import type { HaAxiContext } from "../context.js";
 import type { HaState } from "../ha-client.js";
-import { parseFlags } from "../args.js";
+import { expectPositionals, parseFlags } from "../args.js";
 import {
   rejectUnknownFlags,
   resolveFormat,
@@ -27,8 +27,11 @@ export async function homeCommand(
   ctx: HaAxiContext | undefined,
 ): Promise<string | Record<string, unknown>> {
   if (!ctx) throw new Error("missing context");
-  const { flags } = parseFlags(args, ["json", "help"]);
+  const { positionals, flags } = parseFlags(args, ["json", "help"]);
   rejectUnknownFlags(flags, ["format", "json"], "home");
+  expectPositionals(positionals, 0, {
+    usage: "Run `ha-axi`",
+  });
   const format = resolveFormat(flags);
 
   const header = homeHeader(ctx.binPath);
