@@ -36,7 +36,7 @@ export async function requireMutationConfirm(
 
   if (!isTty) {
     throw new AxiError(
-      "mutation refused: non-interactive session without --confirm",
+      `mutation refused: non-interactive session without --confirm\n${summary}`,
       "CONFIRM_REQUIRED",
       [
         "Re-run with --confirm after reviewing the intended mutation",

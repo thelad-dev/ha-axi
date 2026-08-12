@@ -158,6 +158,31 @@ describe("service call confirmation", () => {
     );
     expect(exitCode).toBe(2);
     expect(stdout).toMatch(/CONFIRM_REQUIRED|confirm/i);
+    expect(stdout).toContain("switch.turn_off");
+    expect(stdout).toContain("switch.desk");
+    expect(serviceCalls).toHaveLength(0);
+  });
+
+  it("surfaces danger notes on CONFIRM_REQUIRED before --confirm", async () => {
+    const { ctx, serviceCalls } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      [
+        "service",
+        "call",
+        "shell_command",
+        "backup",
+        "--data",
+        JSON.stringify({
+          target: { entity_id: "switch.dc_impulse_zone_1" },
+        }),
+      ],
+      ctx,
+    );
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/CONFIRM_REQUIRED/);
+    expect(stdout).toMatch(/dangerous service shell_command\.backup/i);
+    expect(stdout).toMatch(/irrigation|valve|zone/i);
+    expect(stdout).toContain("switch.dc_impulse_zone_1");
     expect(serviceCalls).toHaveLength(0);
   });
 
@@ -256,6 +281,87 @@ describe("service call confirmation", () => {
         service: "turn_on",
         data: {
           entity_id: ["switch.desk", "switch.dc_impulse_zone_1"],
+        },
+      },
+    ]);
+  });
+
+  it("resolves target.entity_id from --data for danger notes", async () => {
+    const { ctx, serviceCalls } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      [
+        "service",
+        "call",
+        "switch",
+        "turn_on",
+        "--data",
+        JSON.stringify({
+          target: { entity_id: "switch.dc_impulse_zone_1" },
+        }),
+        "--confirm",
+        "--format",
+        "json",
+      ],
+      ctx,
+    );
+    expect(exitCode ?? 0).toBe(0);
+    const parsed = JSON.parse(stdout) as {
+      entity_id: string;
+      danger?: string[];
+    };
+    expect(parsed.entity_id).toBe("switch.dc_impulse_zone_1");
+    expect(parsed.danger?.some((n) => /irrigation|valve|zone/i.test(n))).toBe(
+      true,
+    );
+    expect(serviceCalls).toEqual([
+      {
+        domain: "switch",
+        service: "turn_on",
+        data: { target: { entity_id: "switch.dc_impulse_zone_1" } },
+      },
+    ]);
+  });
+
+  it("resolves target.entity_id arrays from --data for danger notes", async () => {
+    const { ctx, serviceCalls } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      [
+        "service",
+        "call",
+        "switch",
+        "turn_on",
+        "--data",
+        JSON.stringify({
+          target: {
+            entity_id: ["switch.desk", "switch.dc_impulse_zone_1"],
+          },
+        }),
+        "--confirm",
+        "--format",
+        "json",
+      ],
+      ctx,
+    );
+    expect(exitCode ?? 0).toBe(0);
+    const parsed = JSON.parse(stdout) as {
+      entity_id: string[];
+      danger?: string[];
+    };
+    expect(parsed.entity_id).toEqual([
+      "switch.desk",
+      "switch.dc_impulse_zone_1",
+    ]);
+    expect(parsed.danger?.some((n) => /irrigation|valve|zone/i.test(n))).toBe(
+      true,
+    );
+    expect(serviceCalls).toEqual([
+      {
+        domain: "switch",
+        service: "turn_on",
+        data: {
+          target: {
+            entity_id: ["switch.desk", "switch.dc_impulse_zone_1"],
+          },
         },
       },
     ]);
