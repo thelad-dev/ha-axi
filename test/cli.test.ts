@@ -390,6 +390,32 @@ describe("parseLimit validation", () => {
   });
 });
 
+describe("value flag validation", () => {
+  it("rejects bare --domain without a value", async () => {
+    const { ctx } = createTestContext();
+    const { stdout, exitCode } = await runCli(["state", "list", "--domain"], ctx);
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|requires a value/i);
+  });
+
+  it("rejects bare --data without a value", async () => {
+    const { ctx } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      ["service", "call", "light", "turn_on", "--data", "--confirm"],
+      ctx,
+    );
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|requires a value/i);
+  });
+
+  it("rejects bare --limit without a value", async () => {
+    const { ctx } = createTestContext();
+    const { stdout, exitCode } = await runCli(["state", "list", "--limit"], ctx);
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|invalid --limit/i);
+  });
+});
+
 describe("automation / config / registry", () => {
   it("lists automations", async () => {
     const { ctx } = createTestContext();

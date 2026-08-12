@@ -67,7 +67,15 @@ export function flagString(
   name: string,
 ): string | undefined {
   const v = flags[name];
-  return typeof v === "string" ? v : undefined;
+  if (v === undefined) return undefined;
+  if (typeof v !== "string") {
+    throw new AxiError(
+      `flag --${name} requires a value`,
+      "VALIDATION_ERROR",
+      [`Provide --${name} <value>`],
+    );
+  }
+  return v;
 }
 
 export function flagBool(

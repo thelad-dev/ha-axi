@@ -41,7 +41,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "dependencies": {
     "@toon-format/toon": "^2.1.0",
