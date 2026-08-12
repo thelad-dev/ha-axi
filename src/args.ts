@@ -1,3 +1,5 @@
+import { AxiError } from "axi-sdk-js";
+
 /**
  * Minimal flag parser. Supports `--key value`, `--key=value`, boolean `--flag`.
  * Names in `booleans` are always boolean even when followed by a non-flag token.
@@ -41,10 +43,22 @@ export function parseLimit(
   fallback: number,
   max: number,
 ): number {
-  if (typeof value !== "string") return fallback;
-  if (!/^\d+$/.test(value)) return fallback;
+  if (value === undefined) return fallback;
+  if (typeof value !== "string" || !/^\d+$/.test(value)) {
+    throw new AxiError(
+      `invalid --limit ${String(value)} (expected integer 1..${max})`,
+      "VALIDATION_ERROR",
+      [`Run with --limit <n> where n is between 1 and ${max}`],
+    );
+  }
   const parsed = Number.parseInt(value, 10);
-  if (!Number.isFinite(parsed) || parsed < 1) return fallback;
+  if (!Number.isFinite(parsed) || parsed < 1) {
+    throw new AxiError(
+      `invalid --limit ${value} (expected integer 1..${max})`,
+      "VALIDATION_ERROR",
+      [`Run with --limit <n> where n is between 1 and ${max}`],
+    );
+  }
   return Math.min(parsed, max);
 }
 
