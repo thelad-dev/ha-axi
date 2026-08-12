@@ -68,7 +68,7 @@ export function flagString(
 ): string | undefined {
   const v = flags[name];
   if (v === undefined) return undefined;
-  if (typeof v !== "string") {
+  if (typeof v !== "string" || v.trim() === "") {
     throw new AxiError(
       `flag --${name} requires a value`,
       "VALIDATION_ERROR",
