@@ -70,12 +70,14 @@ export async function requireMutationConfirm(
 export function dangerNotesForService(
   domain: string,
   service: string,
-  entityId?: string,
+  entityId?: string | readonly string[],
 ): string[] {
   const notes: string[] = [];
   const d = domain.toLowerCase();
   const s = service.toLowerCase();
-  const e = (entityId ?? "").toLowerCase();
+  const entities = (
+    Array.isArray(entityId) ? entityId : entityId ? [entityId] : []
+  ).filter((id): id is string => typeof id === "string" && id.length > 0);
   const key = `${d}.${s}`;
 
   if (
@@ -93,18 +95,28 @@ export function dangerNotesForService(
     notes.push(`dangerous service ${domain}.${service}`);
   }
 
-  if (
-    e.includes("dc_impulse") ||
-    e.includes("ventil") ||
-    e.includes("valve") ||
-    e.includes("irrigation") ||
-    e.includes("bewaesser") ||
-    e.includes("bewasser")
-  ) {
-    notes.push(`entity looks like irrigation/valve (${entityId})`);
+  let zoneSwitchNote = false;
+  for (const id of entities) {
+    const e = id.toLowerCase();
+    if (
+      e.includes("dc_impulse") ||
+      e.includes("ventil") ||
+      e.includes("valve") ||
+      e.includes("irrigation") ||
+      e.includes("bewaesser") ||
+      e.includes("bewasser")
+    ) {
+      notes.push(`entity looks like irrigation/valve (${id})`);
+    }
+    if (
+      d === "switch" &&
+      (s === "turn_on" || s === "toggle") &&
+      e.includes("zone")
+    ) {
+      zoneSwitchNote = true;
+    }
   }
-
-  if (d === "switch" && (s === "turn_on" || s === "toggle") && e.includes("zone")) {
+  if (zoneSwitchNote) {
     notes.push("zone switch turn_on/toggle may open valves");
   }
 

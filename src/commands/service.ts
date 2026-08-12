@@ -115,7 +115,7 @@ async function serviceCall(
     );
   }
 
-  const entityId =
+const flagEntityId =
     flagString(flags, "entity-id") ?? flagString(flags, "entity_id");
   let data: Record<string, unknown> = {};
   const dataRaw = flagString(flags, "data");
@@ -134,14 +134,15 @@ async function serviceCall(
       );
     }
   }
-  if (entityId) {
-    data = { ...data, entity_id: entityId };
+  if (flagEntityId) {
+    data = { ...data, entity_id: flagEntityId };
   }
 
-  const danger = dangerNotesForService(domain, service, entityId);
+  const entityIds = entityIdsFromServiceData(data);
+  const danger = dangerNotesForService(domain, service, entityIds);
   const summaryParts = [
     `Call Home Assistant service ${domain}.${service}`,
-    entityId ? `entity_id=${entityId}` : undefined,
+    entityIds.length > 0 ? `entity_id=${entityIds.join(",")}` : undefined,
     dataRaw ? `data keys: ${Object.keys(data).join(",")}` : undefined,
   ].filter(Boolean);
 
@@ -158,9 +159,26 @@ async function serviceCall(
     ok: `called ${domain}.${service}`,
     domain,
     service,
-    entity_id: entityId ?? null,
+    entity_id:
+      entityIds.length === 0
+        ? null
+        : entityIds.length === 1
+          ? entityIds[0]
+          : entityIds,
     result_states: changed,
     danger: danger.length > 0 ? danger : undefined,
   };
   return format === "json" ? renderPayload(payload, "json") : payload;
+}
+
+/** Resolve target entity ids from merged service data (string or list). */
+function entityIdsFromServiceData(data: Record<string, unknown>): string[] {
+  const raw = data.entity_id;
+  if (typeof raw === "string" && raw.length > 0) return [raw];
+  if (Array.isArray(raw)) {
+    return raw.filter(
+      (id): id is string => typeof id === "string" && id.length > 0,
+    );
+  }
+  return [];
 }

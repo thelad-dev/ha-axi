@@ -185,6 +185,103 @@ describe("service call confirmation", () => {
       },
     ]);
   });
+
+  it("resolves entity_id from --data for danger notes", async () => {
+    const { ctx, serviceCalls } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      [
+        "service",
+        "call",
+        "switch",
+        "turn_on",
+        "--data",
+        JSON.stringify({ entity_id: "switch.dc_impulse_zone_1" }),
+        "--confirm",
+        "--format",
+        "json",
+      ],
+      ctx,
+    );
+    expect(exitCode ?? 0).toBe(0);
+    const parsed = JSON.parse(stdout) as {
+      entity_id: string;
+      danger?: string[];
+    };
+    expect(parsed.entity_id).toBe("switch.dc_impulse_zone_1");
+    expect(parsed.danger?.some((n) => /irrigation|valve|zone/i.test(n))).toBe(
+      true,
+    );
+    expect(serviceCalls).toEqual([
+      {
+        domain: "switch",
+        service: "turn_on",
+        data: { entity_id: "switch.dc_impulse_zone_1" },
+      },
+    ]);
+  });
+
+  it("resolves entity_id arrays from --data for danger notes", async () => {
+    const { ctx, serviceCalls } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      [
+        "service",
+        "call",
+        "switch",
+        "turn_on",
+        "--data",
+        JSON.stringify({
+          entity_id: ["switch.desk", "switch.dc_impulse_zone_1"],
+        }),
+        "--confirm",
+        "--format",
+        "json",
+      ],
+      ctx,
+    );
+    expect(exitCode ?? 0).toBe(0);
+    const parsed = JSON.parse(stdout) as {
+      entity_id: string[];
+      danger?: string[];
+    };
+    expect(parsed.entity_id).toEqual([
+      "switch.desk",
+      "switch.dc_impulse_zone_1",
+    ]);
+    expect(parsed.danger?.some((n) => /irrigation|valve|zone/i.test(n))).toBe(
+      true,
+    );
+    expect(serviceCalls).toEqual([
+      {
+        domain: "switch",
+        service: "turn_on",
+        data: {
+          entity_id: ["switch.desk", "switch.dc_impulse_zone_1"],
+        },
+      },
+    ]);
+  });
+});
+
+describe("parseLimit validation", () => {
+  it("rejects non-numeric --limit", async () => {
+    const { ctx } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      ["state", "list", "--limit", "abc"],
+      ctx,
+    );
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|invalid --limit/i);
+  });
+
+  it("rejects out-of-range --limit 0", async () => {
+    const { ctx } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      ["state", "list", "--limit", "0"],
+      ctx,
+    );
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|invalid --limit/i);
+  });
 });
 
 describe("automation / config / registry", () => {

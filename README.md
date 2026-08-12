@@ -87,7 +87,7 @@ ha-axi service list --domain switch
 ha-axi service call switch turn_off --entity-id switch.desk --confirm
 ha-axi area list
 ha-axi device list --search zigbee --limit 30
-ha-axi --format json doctor
+ha-axi doctor --format json
 ```
 
 ## Out of scope
