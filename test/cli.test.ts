@@ -432,6 +432,16 @@ describe("value flag validation", () => {
     expect(stdout).toMatch(/VALIDATION_ERROR|requires a value|--format toon\|json/i);
   });
 
+  it("rejects unknown --fields values on state list", async () => {
+    const { ctx } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      ["state", "list", "--fields", "all"],
+      ctx,
+    );
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|invalid --fields|--fields full/i);
+  });
+
   it("rejects unknown --query on entity search", async () => {
     const { ctx } = createTestContext();
     const { stdout, exitCode } = await runCli(

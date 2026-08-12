@@ -52,7 +52,15 @@ async function stateList(
   const domain = flagString(flags, "domain");
   const search = (flagString(flags, "search") ?? "").toLowerCase();
   const limit = parseLimit(flags.limit, 50, 500);
-  const fullFields = flagString(flags, "fields") === "full" || flagBool(flags, "full");
+  const fields = flagString(flags, "fields");
+  if (fields !== undefined && fields.toLowerCase() !== "full") {
+    throw new AxiError(
+      "invalid --fields value",
+      "VALIDATION_ERROR",
+      ["Use --fields full or --full"],
+    );
+  }
+  const fullFields = fields !== undefined || flagBool(flags, "full");
 
   let states = await ctx.client.listStates();
   if (domain) {
