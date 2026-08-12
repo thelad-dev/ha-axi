@@ -456,6 +456,44 @@ describe("positional arity validation", () => {
     expect(serviceCalls).toEqual([]);
   });
 
+  it("rejects empty --entity-id before confirm/network", async () => {
+    const { ctx, serviceCalls } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      [
+        "service",
+        "call",
+        "switch",
+        "turn_off",
+        "--entity-id",
+        "",
+        "--confirm",
+      ],
+      ctx,
+    );
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|requires a value/i);
+    expect(serviceCalls).toEqual([]);
+  });
+
+  it("rejects whitespace-only --entity-id before confirm/network", async () => {
+    const { ctx, serviceCalls } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      [
+        "service",
+        "call",
+        "switch",
+        "turn_off",
+        "--entity-id",
+        "   ",
+        "--confirm",
+      ],
+      ctx,
+    );
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|requires a value/i);
+    expect(serviceCalls).toEqual([]);
+  });
+
   it("rejects extra positionals on state list", async () => {
     const { ctx } = createTestContext();
     const { stdout, exitCode } = await runCli(["state", "list", "light"], ctx);
