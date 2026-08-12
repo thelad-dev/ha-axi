@@ -4,14 +4,15 @@ This file is the project's committed home for project-intrinsic agent knowledge:
 
 ## Build & test
 
-- `npm install && npm test && npm run build`
+- `npm install && npm test && npm run build` (Node >=22; `tsc` is the static check — no eslint/prettier script)
 - Entry: `bin/ha-axi.ts` → `dist/bin/ha-axi.js` (fast-path `--version` via `axi-sdk-js/fast-path`)
+- Keep `src/version.ts` in sync with `package.json` `version` (fast-path leaf, no package.json import)
 - Skill: `skills/ha-axi/SKILL.md` (shipped in npm package)
 
 ## Auth & safety
 
-- Config: `HA_URL`/`HA_TOKEN` (aliases `HASS_SERVER`/`HASS_TOKEN`) or `~/.config/ha-axi/config.json`
-- Default URL: `http://homeassistant.local:8123` — never echo tokens (see `src/format.ts` `redactSecrets`)
+- Config resolution: `src/config.ts` (`HA_URL`/`HA_TOKEN`, aliases `HASS_SERVER`/`HASS_URL`/`HASS_TOKEN`, `~/.config/ha-axi/config.json`, default URL)
+- Never echo tokens (see `src/format.ts` `redactSecrets`)
 - Mutations: TTY y/N or `--confirm`; non-interactive without flag → `CONFIRM_REQUIRED` (`src/confirm.ts`)
 - Captain decisions: two packages (`ha-axi` + separate `z2m-axi`); no static deny-only for danger
 

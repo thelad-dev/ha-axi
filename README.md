@@ -7,6 +7,8 @@ local auth, and **confirmed** mutations so agents can orient and act safely.
 
 ## Install
 
+Requires **Node.js 22+**.
+
 ```sh
 npm install -g ha-axi
 # or
@@ -32,7 +34,7 @@ Never print tokens to stdout or logs.
 | Source | Keys |
 |---|---|
 | Environment | `HA_URL` (default `http://homeassistant.local:8123`), `HA_TOKEN` |
-| Env aliases | `HASS_SERVER`, `HASS_TOKEN` (hass-cli compatible) |
+| Env aliases | `HASS_SERVER` / `HASS_URL`, `HASS_TOKEN` (hass-cli compatible) |
 | Config file | `~/.config/ha-axi/config.json` → `{ "url": "...", "token": "..." }` (mode `0600`) |
 
 Create a **Long-Lived Access Token** in Home Assistant: **Profile → Security**.
@@ -49,11 +51,11 @@ ha-axi doctor
 |---|---|
 | `ha-axi` | Home view — version, entity counts, problem sample, next steps |
 | `ha-axi doctor` | Reachability + auth check (token shown only as present/missing) |
-| `ha-axi state list` | List states (`--domain`, `--search`, `--limit`) |
+| `ha-axi state list` | List states (`--domain`, `--search`, `--limit`, `--fields full`) |
 | `ha-axi state get <id>` | One entity (`--full` for complete attributes) |
-| `ha-axi entity search <q>` | Search entity id / friendly name |
+| `ha-axi entity search <q>` | Search entity id, friendly name, attributes |
 | `ha-axi service list` | List services (`--domain`) |
-| `ha-axi service call <domain> <service>` | Call service (**confirm**) |
+| `ha-axi service call <domain> <service>` | Call service (**confirm**; `--entity-id`, `--data`) |
 | `ha-axi automation list` | List `automation.*` |
 | `ha-axi automation reload` | Reload automations (**confirm**) |
 | `ha-axi config info` | Version, location, timezone |
@@ -61,8 +63,10 @@ ha-axi doctor
 | `ha-axi area list` | Area registry (WebSocket) |
 | `ha-axi device list` | Device registry (WebSocket) |
 | `ha-axi setup hooks` | Install SessionStart hooks |
+| `ha-axi update` | Self-update via npm (SDK built-in; `--check` dry-run) |
 
 Global: `--format toon|json` (default TOON), `--json`, `-v` / `--version`, `--help`.
+Mutating commands also accept `--confirm` (see below). Command-level flags: `ha-axi <command> --help`.
 
 ## Mutations and safety
 
@@ -97,6 +101,8 @@ ha-axi doctor --format json
 - Direct `.storage` or YAML edits on the HA host
 
 ## Development
+
+Node.js 22+.
 
 ```sh
 npm install
