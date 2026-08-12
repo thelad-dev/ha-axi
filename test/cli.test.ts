@@ -520,6 +520,66 @@ describe("positional arity validation", () => {
     expect(exitCode).toBe(2);
     expect(stdout).toMatch(/VALIDATION_ERROR|unexpected positional/i);
   });
+
+  it("rejects empty service call domain positional before confirm/network", async () => {
+    const { ctx, serviceCalls } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      ["service", "call", "", "turn_off", "--confirm"],
+      ctx,
+    );
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|must not be empty/i);
+    expect(serviceCalls).toEqual([]);
+  });
+
+  it("rejects whitespace-only service call service positional before confirm/network", async () => {
+    const { ctx, serviceCalls } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      ["service", "call", "switch", "   ", "--confirm"],
+      ctx,
+    );
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|must not be empty/i);
+    expect(serviceCalls).toEqual([]);
+  });
+
+  it("rejects empty entity_id in --data before confirm/network", async () => {
+    const { ctx, serviceCalls } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      [
+        "service",
+        "call",
+        "switch",
+        "turn_off",
+        "--data",
+        JSON.stringify({ entity_id: "" }),
+        "--confirm",
+      ],
+      ctx,
+    );
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|entity_id is present but empty/i);
+    expect(serviceCalls).toEqual([]);
+  });
+
+  it("rejects empty target.entity_id array in --data before confirm/network", async () => {
+    const { ctx, serviceCalls } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      [
+        "service",
+        "call",
+        "switch",
+        "turn_off",
+        "--data",
+        JSON.stringify({ target: { entity_id: ["", "  "] } }),
+        "--confirm",
+      ],
+      ctx,
+    );
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|entity_id is present but empty/i);
+    expect(serviceCalls).toEqual([]);
+  });
 });
 
 describe("automation / config / registry", () => {

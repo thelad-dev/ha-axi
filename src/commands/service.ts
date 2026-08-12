@@ -144,6 +144,15 @@ async function serviceCall(
   }
 
   const entityIds = entityIdsFromServiceData(data);
+  if (serviceDataDeclaresEntityId(data) && entityIds.length === 0) {
+    throw new AxiError(
+      "entity_id is present but empty",
+      "VALIDATION_ERROR",
+      [
+        "Provide a non-empty --entity-id <id> or --data entity_id / target.entity_id",
+      ],
+    );
+  }
   const danger = dangerNotesForService(domain, service, entityIds);
   const summaryParts = [
     `Call Home Assistant service ${domain}.${service}`,
@@ -176,21 +185,34 @@ async function serviceCall(
   return format === "json" ? renderPayload(payload, "json") : payload;
 }
 
+/** True when merged service data declares entity_id at top level or under target. */
+function serviceDataDeclaresEntityId(data: Record<string, unknown>): boolean {
+  if (Object.prototype.hasOwnProperty.call(data, "entity_id")) return true;
+  const target = data.target;
+  if (target && typeof target === "object" && !Array.isArray(target)) {
+    return Object.prototype.hasOwnProperty.call(target, "entity_id");
+  }
+  return false;
+}
+
 /** Resolve entity ids from merged service data / target (string or list). */
 function entityIdsFromServiceData(data: Record<string, unknown>): string[] {
   const ids: string[] = [];
   const seen = new Set<string>();
   const collect = (raw: unknown): void => {
-    if (typeof raw === "string" && raw.length > 0) {
-      if (!seen.has(raw)) {
-        seen.add(raw);
-        ids.push(raw);
+    if (typeof raw === "string") {
+      const id = raw.trim();
+      if (id.length > 0 && !seen.has(id)) {
+        seen.add(id);
+        ids.push(id);
       }
       return;
     }
     if (Array.isArray(raw)) {
-      for (const id of raw) {
-        if (typeof id === "string" && id.length > 0 && !seen.has(id)) {
+      for (const item of raw) {
+        if (typeof item !== "string") continue;
+        const id = item.trim();
+        if (id.length > 0 && !seen.has(id)) {
           seen.add(id);
           ids.push(id);
         }
