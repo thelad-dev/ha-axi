@@ -8,16 +8,16 @@ export type OutputFormat = "toon" | "json";
 export function resolveFormat(
   flags: Record<string, string | boolean>,
 ): OutputFormat {
-  if (flags.json === true || flags.json === "true") return "json";
   const fmt = flags.format;
-  if (fmt === undefined) return "toon";
-  if (typeof fmt !== "string") {
+  if (fmt !== undefined && typeof fmt !== "string") {
     throw new AxiError(
       "flag --format requires a value",
       "VALIDATION_ERROR",
       ["Provide --format toon|json"],
     );
   }
+  if (flags.json === true || flags.json === "true") return "json";
+  if (fmt === undefined) return "toon";
   const lower = fmt.toLowerCase();
   if (lower === "json") return "json";
   if (lower === "toon") return "toon";

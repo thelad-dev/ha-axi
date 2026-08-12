@@ -422,6 +422,16 @@ describe("value flag validation", () => {
     expect(stdout).toMatch(/VALIDATION_ERROR|requires a value|--format toon\|json/i);
   });
 
+  it("rejects bare --format even when --json is also set", async () => {
+    const { ctx } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      ["doctor", "--json", "--format"],
+      ctx,
+    );
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|requires a value|--format toon\|json/i);
+  });
+
   it("rejects unknown --query on entity search", async () => {
     const { ctx } = createTestContext();
     const { stdout, exitCode } = await runCli(
