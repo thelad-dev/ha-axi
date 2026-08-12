@@ -98,16 +98,25 @@ export function expectPositionals(
     extraHelp?: (extras: string[]) => string[];
   },
 ): string[] {
-  if (positionals.length === count) return positionals;
-  if (positionals.length < count) {
+  const trimmed = positionals.map((p) => p.trim());
+  const emptyAt = trimmed.findIndex((p) => p === "");
+  if (emptyAt !== -1) {
     throw new AxiError(
-      options.missingMessage ??
-        `expected ${count} positional argument${count === 1 ? "" : "s"}, got ${positionals.length}`,
+      `positional argument ${emptyAt + 1} must not be empty`,
       "VALIDATION_ERROR",
       [options.usage],
     );
   }
-  const extras = positionals.slice(count);
+  if (trimmed.length === count) return trimmed;
+  if (trimmed.length < count) {
+    throw new AxiError(
+      options.missingMessage ??
+        `expected ${count} positional argument${count === 1 ? "" : "s"}, got ${trimmed.length}`,
+      "VALIDATION_ERROR",
+      [options.usage],
+    );
+  }
+  const extras = trimmed.slice(count);
   const help = [
     options.usage,
     ...(options.extraHelp?.(extras) ?? []),
