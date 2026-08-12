@@ -10,17 +10,22 @@ export function resolveFormat(
 ): OutputFormat {
   if (flags.json === true || flags.json === "true") return "json";
   const fmt = flags.format;
-  if (typeof fmt === "string") {
-    const lower = fmt.toLowerCase();
-    if (lower === "json") return "json";
-    if (lower === "toon") return "toon";
+  if (fmt === undefined) return "toon";
+  if (typeof fmt !== "string") {
     throw new AxiError(
-      `unknown --format ${fmt} (use toon or json)`,
+      "flag --format requires a value",
       "VALIDATION_ERROR",
-      ["Run with --format toon or --format json"],
+      ["Provide --format toon|json"],
     );
   }
-  return "toon";
+  const lower = fmt.toLowerCase();
+  if (lower === "json") return "json";
+  if (lower === "toon") return "toon";
+  throw new AxiError(
+    `unknown --format ${fmt} (use toon or json)`,
+    "VALIDATION_ERROR",
+    ["Run with --format toon or --format json"],
+  );
 }
 
 /** Render structured output; used when a command returns a pre-rendered string. */

@@ -414,6 +414,23 @@ describe("value flag validation", () => {
     expect(exitCode).toBe(2);
     expect(stdout).toMatch(/VALIDATION_ERROR|invalid --limit/i);
   });
+
+  it("rejects bare --format without a value", async () => {
+    const { ctx } = createTestContext();
+    const { stdout, exitCode } = await runCli(["doctor", "--format"], ctx);
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|requires a value|--format toon\|json/i);
+  });
+
+  it("rejects unknown --query on entity search", async () => {
+    const { ctx } = createTestContext();
+    const { stdout, exitCode } = await runCli(
+      ["entity", "search", "--query", "kitchen"],
+      ctx,
+    );
+    expect(exitCode).toBe(2);
+    expect(stdout).toMatch(/VALIDATION_ERROR|unknown flag --query/i);
+  });
 });
 
 describe("automation / config / registry", () => {
