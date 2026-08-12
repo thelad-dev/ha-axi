@@ -26,8 +26,8 @@ global flags:
   --help               Command help
 
 auth:
-  HA_URL / HASS_SERVER   default http://homeassistant.local:8123
-  HA_TOKEN / HASS_TOKEN  Long-Lived Access Token (never echoed)
+  HA_URL / HASS_SERVER / HASS_URL   default http://homeassistant.local:8123
+  HA_TOKEN / HASS_TOKEN             Long-Lived Access Token (never echoed)
   or ~/.config/ha-axi/config.json  { "url", "token" } mode 0600
 
 mutations:
@@ -68,7 +68,7 @@ examples:
 `,
   entity: `usage: ha-axi entity search <query> [--limit <n>] [--domain <domain>]
 
-Search entity_id, friendly_name, and common attributes.
+Search entity_id, friendly_name, and string attributes.
 Default limit 30.
 
 examples:

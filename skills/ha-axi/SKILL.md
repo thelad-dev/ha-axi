@@ -14,9 +14,10 @@ calls, automation status, or area/device registry data.
 ## Auth (never print tokens)
 
 - Env: `HA_URL` (default `http://homeassistant.local:8123`), `HA_TOKEN`
-- Aliases: `HASS_SERVER`, `HASS_TOKEN`
+- Aliases: `HASS_SERVER` / `HASS_URL`, `HASS_TOKEN`
 - File: `~/.config/ha-axi/config.json` `{ "url", "token" }` mode `0600`
 - Long-Lived Access Token: HA Profile → Security
+- Requires Node.js 22+
 
 ## Core commands
 
