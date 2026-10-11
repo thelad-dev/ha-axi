@@ -19,14 +19,20 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
+          # Staged publishing needs Node >= 22.14 and npm CLI >= 11.15.0.
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
+
+      - name: Ensure npm supports staged publishing
+        run: npm install -g npm@^11.15.0 && npm --version && node --version
 
       - run: npm ci
       - run: npm test
       - run: npm run build
 
-      - name: Publish to npm
-        run: npm publish --provenance
+      # Stage only — no 2FA. Captain approves on npmjs.com with Passkey.
+      # Works for brand-new packages (registry creates placeholder 0.0.0-stage).
+      - name: Stage package on npm
+        run: npm stage publish --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
