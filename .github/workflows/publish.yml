@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  # Provenance attestations need OIDC to Sigstore even when npm auth uses a token.
   id-token: write
   contents: read
 
@@ -21,16 +22,11 @@ jobs:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
 
-      # Trusted Publishing needs npm CLI >= 11.5.1 (Node 22 runners may ship older).
-      - name: Ensure npm supports Trusted Publishing
-        run: npm install -g npm@^11.5.1 && npm --version && node --version
-
       - run: npm ci
       - run: npm test
       - run: npm run build
 
-      # OIDC auth via Trusted Publisher — no NPM_TOKEN.
-      # Provenance is automatic with Trusted Publishing from public repos;
-      # --provenance keeps the attestation explicit if a one-off token is used later.
       - name: Publish to npm
         run: npm publish --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
