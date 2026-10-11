@@ -10,10 +10,12 @@ local auth, and **confirmed** mutations so agents can orient and act safely.
 Requires **Node.js 22+**.
 
 ```sh
-npm install -g ha-axi
+npm install -g @dtrywets/ha-axi
 # or
-npx -y ha-axi doctor
+npx -y @dtrywets/ha-axi doctor
 ```
+
+The unscoped npm package `ha-axi` is a different project; install and run this CLI as `@dtrywets/ha-axi` (the binary name remains `ha-axi`).
 
 Agent Skill (on-demand):
 
