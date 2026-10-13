@@ -240,16 +240,16 @@ ha-axi service list --domain light
 ```
 
 ```text
-count: 4 of 4 total
-services[4]{domain,service,name}:
-  light,toggle,""
-  light,turn_off,""
-  light,turn_on,""
-  light,set_brightness,Set brightness
+count: 3 of 3 total
+services[3]{domain,service,name}:
+  light,toggle,Toggle
+  light,turn_off,Turn off
+  light,turn_on,Turn on
 ```
 
 ```sh
 # mutation — refused without TTY y/N or --confirm
+ha-axi service call light turn_on --entity-id light.office_desk --data '{"brightness": 120}' --confirm
 ha-axi service call light turn_off --entity-id light.office_desk --confirm
 ```
 
