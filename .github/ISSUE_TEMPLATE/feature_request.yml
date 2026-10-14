@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest an improvement for ha-axi
+title: "[feat] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem you hit and the behavior you want. Check existing issues first.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do that is awkward or impossible today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Concrete CLI shape or output change if you have one
+      placeholder: |
+        ha-axi … should …
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds, MCP server, raw REST, other CLIs, etc.
+    validations:
+      required: false
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This is about the HA AXI CLI (not Zigbee2MQTT admin / ESP flash)
+          required: true
+        - label: I understand the published package name is `@dtrywets/ha-axi`
+          required: true
