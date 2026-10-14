@@ -1,6 +1,6 @@
 {
   "name": "@dtrywets/ha-axi",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AXI CLI for Home Assistant — token-efficient TOON output, REST + WebSocket, safe confirmed mutations",
   "type": "module",
   "repository": {
