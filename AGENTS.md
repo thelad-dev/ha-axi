@@ -14,7 +14,7 @@ This file is the project's committed home for project-intrinsic agent knowledge:
 - Config resolution: `src/config.ts` (`HA_URL`/`HA_TOKEN`, aliases `HASS_SERVER`/`HASS_URL`/`HASS_TOKEN`, `~/.config/ha-axi/config.json`, default URL)
 - Never echo tokens (see `src/format.ts` `redactSecrets`)
 - Mutations: TTY y/N or `--confirm`; non-interactive without flag → `CONFIRM_REQUIRED` (`src/confirm.ts`)
-- Captain decisions: two packages (`ha-axi` + separate `z2m-axi`); no static deny-only for danger
+- Two packages (`ha-axi` + separate `z2m-axi`); no static deny-only for danger
 
 ## Transport
 

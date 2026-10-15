@@ -30,7 +30,7 @@ jobs:
       - run: npm test
       - run: npm run build
 
-      # Stage only — no 2FA. Captain approves on npmjs.com with Passkey.
+      # Stage only — no 2FA. Approval is on npmjs.com with Passkey.
       # Works for brand-new packages (registry creates placeholder 0.0.0-stage).
       - name: Stage package on npm
         run: npm stage publish --provenance
